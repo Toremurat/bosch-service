@@ -12,6 +12,14 @@
   <div id="content">
     <router-view />
   </div>
+  <footer>
+    <p @click="showSupportAlert">Служба поддержки</p>
+  </footer>
+  <div v-if="showAlert" class="supportAlert">
+      <h3>Служба поддержки</h3>
+      <p>Держитесь... Мы с Вами!</p>
+      <button @click="hideSupportAlert">Принять</button>
+    </div>
 </template>
 
 <script>
@@ -22,6 +30,22 @@ export default {
   components: {
     searchBar,
   },
+  data() {
+    return {
+      showAlert: false
+    };
+  },
+  methods:{
+    // showSupportAlert() {
+    //   this.showAlert = true;
+    // },
+    // hideSupportAlert() {
+    //   this.showAlert = false;
+    // }
+    showSupportAlert() {
+      window.alert('Служба поддержки\n\nДержитесь... Мы с Вами!');
+    }
+  }
 };
 </script>
 
@@ -33,9 +57,25 @@ body {
   padding:0;
   font-family: 'Inter', sans-serif;
 }
+#app{
+  height: 100vh;
+}
+footer {
+  position: sticky;
+  top: 100%;
+  width: 100%;
+  padding: 20px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+footer p {
+  margin: 0;
+  font-size: 14px;
+  color: #2854c2;
+}
 header {
 	padding: 10px 24px;
   position: relative;
+  background-color: #fff;
 }
 .topHeader {
   margin-bottom: 16px;

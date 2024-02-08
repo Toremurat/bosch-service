@@ -78,12 +78,12 @@ data() {
             this.searchData = [];
         },
         fetchData() {
-            axios.post(`http://dev.bosch/index.php?route=api/product/getProducts`, {
+            axios.post(`http://boschcenter.kz/index.php?route=api/product/getProducts`, {
                 model: this.searchTerm
             })
             .then(response => {
                 this.searchData = response.data;
-                console.log('searchData:', this.searchData);
+                
             })
             .catch(error => {
                 console.error('Ошибка при получении данных', error);
@@ -127,7 +127,7 @@ data() {
     border-bottom: 1px solid #f0f0f0;
     position: absolute;
     left: 0;
-    top: 126px;
+    top: 124px;
     width: 100%;
 }
 #searchResult{
