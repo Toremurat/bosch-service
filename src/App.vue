@@ -1,20 +1,25 @@
 <template>
-  <header>
-    <div class="topHeader">
-      <div class="logo">
-        <img src="@/assets/logo.webp" alt="">
+  <div class="application" v-if="screenWidth <= 600">
+    <header>
+      <div class="topHeader">
+        <div class="logo">
+          <img src="@/assets/logo.webp" alt="">
+        </div>
       </div>
+      <div class="bottomHeader">
+        <searchBar />
+      </div>
+    </header>
+    <div id="content">
+      <router-view />
     </div>
-    <div class="bottomHeader">
-      <searchBar />
-    </div>
-  </header>
-  <div id="content">
-    <router-view />
+    <footer>
+      <p @click="showSupportAlert">Служба поддержки</p>
+    </footer>
   </div>
-  <footer>
-    <p @click="showSupportAlert">Служба поддержки</p>
-  </footer>
+  <div v-else>
+    <p>Данная страница не работает на Компьютере, зайдите с телефона, чтобы увидеть страницу.</p>
+  </div>
   <div v-if="showAlert" class="supportAlert">
       <h3>Служба поддержки</h3>
       <p>Держитесь... Мы с Вами!</p>
@@ -32,10 +37,20 @@ export default {
   },
   data() {
     return {
-      showAlert: false
+      showAlert: false,
+      screenWidth: window.innerWidth
     };
   },
+  created() {
+    window.addEventListener('resize', this.updateScreenWidth);
+  },
+  unmounted() {
+    window.removeEventListener('resize', this.updateScreenWidth);
+  },
   methods:{
+    updateScreenWidth() {
+      this.screenWidth = window.innerWidth;
+    },
     // showSupportAlert() {
     //   this.showAlert = true;
     // },
@@ -57,7 +72,7 @@ body {
   padding:0;
   font-family: 'Inter', sans-serif;
 }
-#app{
+.application {
   height: 100vh;
 }
 footer {
