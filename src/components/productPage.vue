@@ -4,24 +4,26 @@
     </div>
     <div v-else-if="error">{{ errorMessage }}</div>
     <div v-else>
+        <div class="img-wrap">
         <img :src="prodData.image ? prodData.image : require('@/assets/image-model2.webp')" alt="Product Image"
-            style="width: 100%;">
+            >
+        </div>
         <div class="prodName">
             <p>{{ prodData.model }}</p>
             <h2>{{ prodData.name }}</h2>
         </div>
         <div class="pricing">
-            <div v-if="prodData.prp">
+            <div v-if="prodData.prp && prodData.prp != prodData.rrp">
                 <p class="price">{{ prodData.prp.toLocaleString() }}<small>₸</small></p>
                 <p class="sale">{{ discount() }}%</p>
-                <p class="oldPrice"><del>{{ prodData.price.toLocaleString() }}</del><small>₸</small></p>
+                <p class="oldPrice"><del>{{ prodData.rrp.toLocaleString() }}</del><small>₸</small></p>
             </div>
             <div v-else>
-                <p class="price">{{ prodData.price.toLocaleString() }}<small>₸</small></p>
+                <p class="price">{{ prodData.rrp.toLocaleString() }}<small>₸</small></p>
             </div>
             <p class="bonus">{{ bonusPercentage }} бонусов</p>
         </div>
-        <div class="loanWrap" v-if="prodData.price > 10000">
+        <div class="loanWrap" v-if="prodData.rrp > 10000">
             <p class="loan" @click="LoanClick">
                 {{ loanValue.value }}<small>₸</small><span> x {{ loanValue.months }} мес</span>
             </p>
@@ -68,10 +70,19 @@ export default {
     created() {
         this.fetchData();
     },
+    watch: {
+        // Наблюдатель за параметром маршрута 'id'
+        '$route.params.id': function(newId, oldId) {
+            // Если новый 'id' отличается от старого, делаем запрос на API
+            if (newId !== oldId) {
+                this.fetchData();
+            }
+        }
+    },
     methods: {
         fetchData() {
             this.isLoading = true;
-            axios.post(`http://boschcenter.kz/index.php?route=api/product/getProduct/`, {
+            axios.post(`https://boschcenter.kz/index.php?route=api/product/getProduct/`, {
                 product_id: this.$route.params.id,
             })
                 .then((response) => {
@@ -82,10 +93,10 @@ export default {
                     console.error('Ошибка при получении данных', error);
                     this.error = error.message || this.errorMessage;
                     this.isLoading = false;
-                });
+                })
         },
         discount() {
-            return Math.round(((this.prodData.price - this.prodData.prp) / this.prodData.price) * 100);
+            return Math.round(((this.prodData.rrp - this.prodData.prp) / this.prodData.rrp) * 100);
         },
         loan() {
             const price = parseFloat(this.prodData.price);
@@ -104,7 +115,7 @@ export default {
         LoanClick() {
             const price = parseFloat(this.prodData.price);
             if (price > 80000) {
-                this.showLoanFor24 = true;
+                this.showLoanFor24 = !this.showLoanFor24;
             }
         },
         getQuantityClass(quantity) {
@@ -138,11 +149,20 @@ export default {
 #content {
     padding: 0 24px;
 }
-
-.prodName {
-    margin-top: -60px;
+.img-wrap {
+  margin-bottom: 16px;
 }
-
+#content .img-wrap {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+#content .img-wrap img {
+  height: 212px;
+  width: auto !important;
+  margin: auto;
+}
 .prodName p {
     margin: 0;
     font-size: 16px;
@@ -284,7 +304,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: calc(100vh - 250px);
     position: relative;
 }
 .lds-ring {
@@ -300,10 +320,10 @@ export default {
   width: 64px;
   height: 64px;
   margin: 8px;
-  border: 8px solid #fff;
+  border: 4px solid #fff;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #fff transparent transparent transparent;
+  border-color: #f0f0f0 transparent transparent transparent;
 }
 .lds-ring div:nth-child(1) {
   animation-delay: -0.45s;

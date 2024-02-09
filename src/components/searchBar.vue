@@ -20,19 +20,19 @@
     <div id="searchWrap" >
         <template  v-if="searchData.length > 0">
             <div id="searchResult">
-            <router-link
+            <div 
                 v-for="result in searchData"
                 :key="result.product_id"
-                :to="'/product/'+ result.product_id"
-                @click="clearSearch">
+                @click="handleProductClick(result.product_id)"
+                >
                 <div class="search-item" :class="{ 'stock': result.quantity < 1 }">
-                    <img :src="prodData.image ? prodData.image : require('@/assets/image-model2.webp')" alt="Product Image" class="product-image"/>
+                    <img :src="result.image" alt="Product Image" class="product-image"/>
                     <div class="product-details">
                         <div class="model">{{ result.model }}</div>
                         <div class="type">{{ result.name }}</div>
                     </div>
                 </div>
-            </router-link>
+            </div >
         </div>
         </template>
     
@@ -54,6 +54,7 @@
 import axios from 'axios';
 
 export default {
+    emits: ['productSelected'],
 data() {
     return {
         searchTerm: '',
@@ -70,6 +71,7 @@ data() {
                 this.isLoading = true;
                 this.debounceTimer = setTimeout(() => {
                     this.fetchData();
+                    this.$emit('clearProdData');
                 }, 500);
             }
         },
@@ -77,8 +79,14 @@ data() {
             this.searchTerm = '';
             this.searchData = [];
         },
+        handleProductClick(productId) {
+            this.searchTerm = '';
+            this.searchData = [];
+            // Передача id выбранного продукта через событие
+            this.$emit('productSelected', productId);
+        },
         fetchData() {
-            axios.post(`http://boschcenter.kz/index.php?route=api/product/getProducts`, {
+            axios.post(`https://boschcenter.kz/index.php?route=api/product/getProducts`, {
                 model: this.searchTerm
             })
             .then(response => {
@@ -98,12 +106,16 @@ data() {
 </script>
 
 <style scoped>
+.search-item.stock {
+    opacity: .5;
+}
 #search input {
 	width: 100%;
 	display: flex;
 	box-sizing: border-box;
 	border: none;
 	background: #F0F0F0;
+    border-radius: 0!important;
 }
 #search input {
 	font-size: 18px;
